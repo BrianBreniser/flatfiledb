@@ -29,10 +29,29 @@ def prependdb(text):
     with open(file, 'w') as f:
         f.write(newfile)
 
-def loadfiletodb(file):
-    with open(file, 'r') as f:
+def loadfiletodb(infile):
+    with open(infile, 'r') as f:
         f.readline()  # ignore header
-        while f.readline()  # rest of the file
+        for i in f.readlines():  # rest of the file
+            if i == "\n":
+                continue
+            i = i.split("|")
+            sbt, title, provider, date, rev, view_time = i
+            if not matchfound(sbt, title, provider):
+                view_time = view_time.strip("\n")
+                data = "{},{},{},{},{},{}\n".format(sbt, title, provider, date, rev, view_time)
+                appenddb(data)
+
+def matchfound(sbt, title, provider):
+    with open(file, 'r') as f:
+        for i in f.readlines():
+            if i == "\n":
+                continue
+            i = i.split(",")
+            if i[0] == sbt and i[1] == title and i[2] == provider:
+                return True  # this constitutes a match
+        return False  # no match found
+
 
 def main():
     datain = "infile.txt"
@@ -40,11 +59,10 @@ def main():
     print("Before:\n\n")
     printdb()
 
+    loadfiletodb("infile.txt")
+
     print("after\n\n")
     printdb()
-
-    print("DROPPING DATABASE!!!")
-    dropdb()
 
 if __name__ == "__main__":
     main()
