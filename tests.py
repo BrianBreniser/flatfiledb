@@ -73,9 +73,16 @@ def test_matchfound():
 
 def test_loadfiletodb():
     db.loadfiletodb(testfile)
-    f = db.returndb()
-    print(f)
-    assert(1 == 1)
+    assert(db.returndb() == ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
+           'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
+           'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
+           'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n'])
+
+    db.loadfiletodb(testfile)
+    assert(db.returndb() == ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
+           'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
+           'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
+           'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n'])
 
 def main():
     # This feels like a hack and is possibly overcomplicated but for now I think it's fine
@@ -99,4 +106,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n', 'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n', 'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n', 'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n']
