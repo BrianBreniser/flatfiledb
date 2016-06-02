@@ -2,8 +2,9 @@
 import ffdb as db
 from os import remove
 
-file = "test1.dat"
-testfile = "infile.txt"
+file = "test1.dat"  # test db
+testfile = "infile.txt"  # test input file
+anothertestfile = "secondinfile.txt"  # second test input file
 db.file = file  # make sure we test on the test file, not the real db
 
 # create an empty db file if it does not exist
@@ -11,9 +12,14 @@ f = open(file, 'w')
 f.close()
 
 data = "STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME\nstb1|the matrix|warner bros|2014-04-01|4.00|1:30\nstb1|unbreakable|buena vista|2014-04-03|6.00|2:05\nstb2|the hobbit|warner bros|2014-04-02|8.00|2:45\nstb3|the matrix|warner bros|2014-04-02|4.00|1:05\n"
+moredata = "STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME\nstb3|the matrix|warner bros|2014-04-02|4.00|1:05\nstb3|new made up movie| buena vista|2014-04-03|6.00|2:05\n"
 
 f = open(testfile, 'w')
 f.write(data)
+f.close()
+
+f = open(anothertestfile, 'w')
+f.write(moredata)
 f.close()
 
 def test_prependdb():
@@ -72,17 +78,21 @@ def test_matchfound():
     assert(db.matchfound("stb1", "matrix", "warner brotherererer") == False)
 
 def test_loadfiletodb():
-    db.loadfiletodb(testfile)
-    assert(db.returndb() == ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
-           'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
-           'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
-           'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n'])
+    no_list_changes = ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
+                       'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
+                       'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
+                       'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n']
+
+    one_change = no_list_changes + ["stb3,new made up movie, buena vista,2014-04-03,6.00,2:05\n"]
 
     db.loadfiletodb(testfile)
-    assert(db.returndb() == ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
-           'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
-           'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
-           'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n'])
+    assert(db.returndb() == no_list_changes)
+
+    db.loadfiletodb(testfile)
+    assert(db.returndb() == no_list_changes)
+
+    db.loadfiletodb(anothertestfile)
+    assert(db.returndb() == one_change)
 
 def main():
     # This feels like a hack and is possibly overcomplicated but for now I think it's fine
@@ -102,6 +112,7 @@ def main():
     print("All tests passed")  # This gives me a good feeling inside
     remove(file)  # clean files from main directory
     remove(testfile)  # clean files from main directory
+    remove(anothertestfile)  # clean files from main directory
 
 if __name__ == "__main__":
     main()
