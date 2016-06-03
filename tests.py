@@ -98,11 +98,11 @@ def main():
     # This feels like a hack and is possibly overcomplicated but for now I think it's fine
     test_list = [
         "test_returndb()",
-        "test_dropdb()",
         "test_prependdb()",
         "test_matchfound()",
         "test_loadfiletodb()",
-        "test_appenddb()"
+        "test_appenddb()",
+        "test_dropdb()"
     ]
     for i in test_list:
         db.dropdb()  # start with a fresh db in between tests
