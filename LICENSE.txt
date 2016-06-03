@@ -1,0 +1,1 @@
+This is free software, distributed without a warranty. This program is meant for educational purposes only, and not meant to be an implementation used in the real world.
