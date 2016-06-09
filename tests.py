@@ -102,10 +102,42 @@ def test_select():
     search_me = db._returndb()
     search_by = ["stb", "title", "provider"]
 
-    print(sel_list)
-    print(q.sel(search_by, search_me))
-
     assert(q.sel(search_by, search_me) == sel_list)
+
+def test_order():
+    orig_order = ['1,matrix,warner bros,2014-04-01,4.00,1:30\n',
+                  '3,matrix,warner bros,2014-04-02,4.00,1:05\n',
+                  '2,hobbit,warner bros,2014-04-02,8.00,2:45\n']
+
+    new_order = ['1,matrix,warner bros,2014-04-01,4.00,1:30\n',
+                 '2,hobbit,warner bros,2014-04-02,8.00,2:45\n',
+                 '3,matrix,warner bros,2014-04-02,4.00,1:05\n']
+
+    a_new_order = ['2,hobbit,warner bros,2014-04-02,8.00,2:45\n',
+                   '1,matrix,warner bros,2014-04-01,4.00,1:30\n',
+                   '3,matrix,warner bros,2014-04-02,4.00,1:05\n']
+
+    assert(q.ord('stb', orig_order) == new_order)
+    assert(q.ord('title', orig_order) == a_new_order)
+
+def test_filter():
+    no_filter = ['1,matrix,warner bros,2014-04-01,4.00,1:30\n',
+                 '3,matrix,warner bros,2014-04-02,4.00,1:05\n',
+                 '2,hobbit,warner bros,2014-04-02,8.00,2:45\n']
+
+    yes_filter = ['1,matrix,warner bros,2014-04-01,4.00,1:30\n']
+
+    assert(q.fil([['stb', '1']], no_filter) == yes_filter)
+
+    other_no_filter = ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
+                       'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
+                       'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
+                       'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n']
+
+    other_yes_filter= ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
+                       'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n']
+
+    assert(q.fil([['stb', 'stb1']], other_no_filter) == other_yes_filter)
 
 def main():
     # This feels like a hack and is possibly overcomplicated but for now I think it's fine
@@ -115,6 +147,8 @@ def main():
         "test_loadfiletodb()",
         "test_appenddb()",
         "test_dropdb()",
+        "test_order()",
+        "test_filter()",
         "test_select()"
     ]
     for i in test_list:

@@ -5,12 +5,13 @@ import os as os
 filedir = 'db/'
 
 def sel(sel_list, old_list):
-    new_list = []  # the new list with only the required options selected
-
+    """ Use ord before calling sel"""
     if not isinstance(sel_list, list):
         return "select failed, first arg must be list"
     if not isinstance(old_list, list):
         return "select fail, second arg must be list"
+
+    new_list = []  # the new list with only the required options selected
 
     for i in old_list:
         new_line = ""
@@ -38,19 +39,81 @@ def sel(sel_list, old_list):
 
     return new_list
 
-def ord(order_list, old_list):
-    new_list = []
+def ord(ord_by, old_list):
+    if not isinstance(ord_by, str):
+        return "select failed, first arg must be string"
+    if not isinstance(old_list, list):
+        return "select fail, second arg must be list"
 
-    
+    new_list = []
+    lol = []  # list of lists
+
+    k = 0
+
+    # I reeealy wish Python had case statements
+    if ord_by == "stb":
+        k = 0
+    elif ord_by == "title":
+        k = 1
+    elif ord_by == "provider":
+        k = 2
+    elif ord_by == "date":
+        k = 3
+    elif ord_by == "rev":
+        k = 4
+    elif ord_by == "view_time":
+        k = 5
+
+    for i in old_list:
+        temp = i.split(",")
+        lol.append(temp)
+
+    # lol now contains a list of lists that can be ordered using sorted
+    lol = sorted(lol, key=lambda x: x[k])
+
+    # create our new list
+    for i in lol:
+        temp = ",".join(i)
+        new_list.append(temp)
     
     return new_list
 
 
-def _returndb():
-    x = []
+def fil(filter_list, old_list):
+    if not isinstance(filter_list, list):
+        return "select failed, first arg must be list"
+    if not isinstance(filter_list[0], list):
+        return "select failed, first arg must be list of lists"
+    if not isinstance(old_list, list):
+        return "select fail, second arg must be list"
 
-    for i in os.listdir(filedir):
-        with open(filedir+i, 'r') as f:
-            x += f.readlines()
+    new_list = []
 
-    return x
+    for i in filter_list:
+        k = 0
+        # I reeealy wish Python had case statements
+        if i[0] == "stb":
+            k = 0
+        elif i[0] == "title":
+            k = 1
+        elif i[0] == "provider":
+            k = 2
+        elif i[0] == "date":
+            k = 3
+        elif i[0] == "rev":
+            k = 4
+        elif i[0] == "view_time":
+            k = 5
+
+        for j in old_list:
+            li = j.split(",")
+            if li[k] == i[1]:
+                new_list.append(j)
+
+    return new_list
+
+def main():
+    return True
+
+if __name__ == "__main__":
+    main()

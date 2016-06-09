@@ -67,31 +67,11 @@ def matchfound(stb, title, provider):
         
         return False  # no match found
 
-def testashitload():
-    for i in range(1, 100001):
-        data = "stb{}|the matrix2|warner bros|2014-04-01|4.00|1:30\n".format(i)
-        _appenddb(data)
-
-
 def main():
+    from sys import argv
 
-    infile = "infile.txt"
-    data = "STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME\n\
-stb1|the matrix2|warner bros|2014-04-01|4.00|1:30\n"
-
-    f = open(infile, 'w')
-    f.write(data)
-    f.close()
-
-    print("Before:\n\n")
-    _printdb()
-
-    loadfiletodb(infile)
-
-    print("after\n\n")
-    _printdb()
-
-    os.remove(infile)
+    print(len(argv))
+    print(argv)
 
 if __name__ == "__main__":
     main()
