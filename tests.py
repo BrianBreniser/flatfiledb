@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import ffdb as db
+import store as db
+import query as q
 from os import remove
 
 file = "test1.dat"  # test db
@@ -22,41 +23,31 @@ f = open(anothertestfile, 'w')
 f.write(moredata)
 f.close()
 
-def test_prependdb():
-    db.appenddb("asdf\n")
-    assert(db.returndb() == ["asdf\n"])
-    db.appenddb("qwer\n")
-    assert(db.returndb() == ["asdf\n", "qwer\n"])
-    db.prependdb("zxcv\n")
-    assert(db.returndb() == ["zxcv\n", "asdf\n", "qwer\n"])
-    db.prependdb("uiop\n")
-    assert(db.returndb() == ["uiop\n", "zxcv\n", "asdf\n", "qwer\n"])
-
 def test_appenddb():
-    db.appenddb("asdf\n")
-    assert(db.returndb() == ["asdf\n"])
-    db.appenddb("qwer\n")
-    assert(db.returndb() == ["asdf\n", "qwer\n"])
-    db.appenddb("zxcv\n")
-    assert(db.returndb() == ["asdf\n", "qwer\n", "zxcv\n"])
+    db._appenddb("asdf\n")
+    assert(db._returndb() == ["asdf\n"])
+    db._appenddb("qwer\n")
+    assert(db._returndb() == ["asdf\n", "qwer\n"])
+    db._appenddb("zxcv\n")
+    assert(db._returndb() == ["asdf\n", "qwer\n", "zxcv\n"])
 
 def test_returndb():
-    assert(db.returndb() == [])
-    db.appenddb("asdf\n")
-    assert(db.returndb() == ["asdf\n"])
-    db.appenddb("asdf\n")
-    assert(db.returndb() == ["asdf\n", "asdf\n"])
-    db.appenddb("asdf\n")
-    assert(db.returndb() == ["asdf\n", "asdf\n", "asdf\n"])
+    assert(db._returndb() == [])
+    db._appenddb("asdf\n")
+    assert(db._returndb() == ["asdf\n"])
+    db._appenddb("asdf\n")
+    assert(db._returndb() == ["asdf\n", "asdf\n"])
+    db._appenddb("asdf\n")
+    assert(db._returndb() == ["asdf\n", "asdf\n", "asdf\n"])
 
 def test_dropdb():
-    assert(db.returndb() == [])
-    db.appenddb("asdf\n")
-    db.appenddb("asdf\n")
-    db.appenddb("asdf\n")
-    assert(db.returndb() == ["asdf\n", "asdf\n", "asdf\n"])
+    assert(db._returndb() == [])
+    db._appenddb("asdf\n")
+    db._appenddb("asdf\n")
+    db._appenddb("asdf\n")
+    assert(db._returndb() == ["asdf\n", "asdf\n", "asdf\n"])
     db.dropdb()
-    assert(db.returndb() == [])
+    assert(db._returndb() == [])
 
 def test_matchfound():
     data = [
@@ -71,7 +62,7 @@ def test_matchfound():
             "stb1,the matrix,warner bros,2014-04-01,4.00,2:30\n",
             ]
     for i in data:
-        db.appenddb(i)
+        db._appenddb(i)
     assert(db.matchfound("stb1", "the matrix", "warner bros") == True)
     assert(db.matchfound("stb2", "the matrix", "warner bros") == True)
     assert(db.matchfound("stb1", "matrix", "warner bros") == False)
@@ -86,23 +77,45 @@ def test_loadfiletodb():
     one_change = no_list_changes + ["stb3,new made up movie, buena vista,2014-04-03,6.00,2:05\n"]
 
     db.loadfiletodb(testfile)
-    assert(db.returndb() == no_list_changes)
+    assert(db._returndb() == no_list_changes)
 
     db.loadfiletodb(testfile)
-    assert(db.returndb() == no_list_changes)
+    assert(db._returndb() == no_list_changes)
 
     db.loadfiletodb(anothertestfile)
-    assert(db.returndb() == one_change)
+    assert(db._returndb() == one_change)
+
+def test_select():
+    no_list_changes = ['stb1,the matrix,warner bros,2014-04-01,4.00,1:30\n',
+                       'stb1,unbreakable,buena vista,2014-04-03,6.00,2:05\n',
+                       'stb2,the hobbit,warner bros,2014-04-02,8.00,2:45\n',
+                       'stb3,the matrix,warner bros,2014-04-02,4.00,1:05\n']
+
+    sel_list = ['stb1,the matrix,warner bros\n',
+                'stb1,unbreakable,buena vista\n',
+                'stb2,the hobbit,warner bros\n',
+                'stb3,the matrix,warner bros\n']
+
+    db.loadfiletodb(testfile)
+    assert(db._returndb() == no_list_changes)
+
+    search_me = db._returndb()
+    search_by = ["stb", "title", "provider"]
+
+    print(sel_list)
+    print(q.sel(search_by, search_me))
+
+    assert(q.sel(search_by, search_me) == sel_list)
 
 def main():
     # This feels like a hack and is possibly overcomplicated but for now I think it's fine
     test_list = [
         "test_returndb()",
-        "test_prependdb()",
         "test_matchfound()",
         "test_loadfiletodb()",
         "test_appenddb()",
-        "test_dropdb()"
+        "test_dropdb()",
+        "test_select()"
     ]
     for i in test_list:
         db.dropdb()  # start with a fresh db in between tests

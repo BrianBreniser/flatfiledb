@@ -27,14 +27,14 @@ def _appenddb(text):
     list_of_files = os.listdir(filedir)
 
     if len(list_of_files) == 0:
-        with open(filedir+"db1.dat", 'w') as f:
+        with open(filedir+"1.dat", 'w') as f:
             f.write(text)
     else:
         filesize = os.path.getsize(filedir+list_of_files[-1])
 
         if filesize > 1000000:  # consider 1 mb portions only
             # latest file is over 1mb, make a new file
-            fn = "db{}.dat".format(len(list_of_files) + 2)
+            fn = "{}.dat".format(len(list_of_files) + 1)
             with open(filedir+fn, 'w') as f:
                 f.write(text)
         else:
@@ -48,27 +48,27 @@ def loadfiletodb(infile):
         for i in f.readlines():  # rest of the file
             if i == "\n":
                 continue
-            i = i.split("|")
-            sbt, title, provider, date, rev, view_time = i
-            if not matchfound(sbt, title, provider):
+            a = i.split("|")
+            stb, title, provider, date, rev, view_time = a
+            if not matchfound(stb, title, provider):
                 view_time = view_time.strip("\n")
-                data = "{},{},{},{},{},{}\n".format(sbt, title, provider, date, rev, view_time)
+                data = "{},{},{},{},{},{}\n".format(stb, title, provider, date, rev, view_time)
                 _appenddb(data)
 
-def matchfound(sbt, title, provider):
+def matchfound(stb, title, provider):
     for i in os.listdir(filedir):
         with open(filedir+i, 'r') as f:
             for i in f.readlines():
                 if i == "\n" or i == "":
                     continue
                 i = i.split(",")
-                if i[0] == sbt and i[1] == title and i[2] == provider:
+                if i[0] == stb and i[1] == title and i[2] == provider:
                     return True  # this constitutes a match
         
         return False  # no match found
 
 def testashitload():
-    for i in range(1, 20001):
+    for i in range(1, 100001):
         data = "stb{}|the matrix2|warner bros|2014-04-01|4.00|1:30\n".format(i)
         _appenddb(data)
 
@@ -87,7 +87,6 @@ stb1|the matrix2|warner bros|2014-04-01|4.00|1:30\n"
     _printdb()
 
     loadfiletodb(infile)
-    testashitload()
 
     print("after\n\n")
     _printdb()
