@@ -70,8 +70,43 @@ def matchfound(stb, title, provider):
 def main():
     from sys import argv
 
-    print(len(argv))
-    print(argv)
+    if argv[1] == '-h':
+        print("""
+Welcome to the storage program
+
+-h will display this message
+
+In order to store a file call 
+
+$ ./store.py 'filename'
+
+without the quotes
+
+if the file is not in the current directory please provide the full path
+in the even the file is not found, please check the spelling
+
+-d will destroy the database
+
+-p will print the whole database, this is for debugging only, use ./query instead of the -p flag
+              """)
+        exit(0)
+
+    elif argv[1] == '-d':
+        response = input("Are you SURE you want to drop the database?? This cannot be undone:\n(y/n)-> ")
+
+        if response == 'y':
+            dropdb()
+            exit(0)
+        else:
+            print("Did NOT drop the db, exiting")
+            exit(0)
+
+    elif argv[1] == '-p':
+        print("printing whole database\n\n")
+        _printdb()
+        exit(0)
+
+    loadfiletodb(argv[1])
 
 if __name__ == "__main__":
     main()

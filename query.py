@@ -113,6 +113,53 @@ def fil(filter_list, old_list):
     return new_list
 
 def main():
+    from sys import argv
+
+    print(len(argv))
+    print(argv)
+
+    if argv[1] == '-h':
+        print("""
+Welcome to the query program
+
+-h prints this message
+
+-s is the select argument
+use lower case column names, no spaces preferably, and include as many as you want
+for example:
+./query -s stb,title
+will return from the database every line, but only the stb and title of each
+
+-o is the order argument
+use lower case column names, but at the moment can only accept one column
+use like this:
+./query -o title
+will order all results by title, alphanumerically
+
+-f is the filter argument
+use it to limit the results you want to see, use it like so
+./query -f stb=stb1,title="the matrix"
+this will find only stb's that are equal to stb1
+and only when the movie title was "the matrix"
+notice: you use column=argument for each column to filter by
+and separate column-arguments by comma
+you can only use spaces if the space is in the name of the argument
+such as in "the matrix", but you must surround the argument in quotes ""
+
+Of course you can use these in tandem:
+./query -s stb,title -o stb -f stb=stb1,title="the matrix"
+will search for stb's that are stb1, with movie titles "the matrix"
+will order alphabetically by stb
+and will only display the stb and title columns
+              """)
+        exit(0)
+
+    for i in argv:
+        if i = argv[0]:
+            continue
+
+        if i
+
     return True
 
 if __name__ == "__main__":
