@@ -5,7 +5,7 @@ import os as os
 filedir = 'db/'
 
 def sel(sel_list, old_list):
-    """ Use ord before calling sel"""
+    """ Use orde before calling sel"""
     if not isinstance(sel_list, list):
         return "select failed, first arg must be list"
     if not isinstance(old_list, list):
@@ -39,7 +39,7 @@ def sel(sel_list, old_list):
 
     return new_list
 
-def ord(ord_by, old_list):
+def orde(ord_by, old_list):
     if not isinstance(ord_by, str):
         return "select failed, first arg must be string"
     if not isinstance(old_list, list):
@@ -87,7 +87,7 @@ def fil(filter_list, old_list):
     if not isinstance(old_list, list):
         return "select fail, second arg must be list"
 
-    new_list = []
+    new_list = old_list[:]  # clones the list
 
     for i in filter_list:
         k = 0
@@ -107,19 +107,23 @@ def fil(filter_list, old_list):
 
         for j in old_list:
             li = j.split(",")
-            if li[k] == i[1]:
-                new_list.append(j)
+            if li[k] != i[1]:
+                try:
+                    new_list.remove(j)
+                except:
+                    pass
 
     return new_list
 
 def main():
     from sys import argv
 
-    print(len(argv))
-    print(argv)
+    # print(len(argv))
+    # print(argv)
 
-    if argv[1] == '-h':
-        print("""
+    if len(argv) > 1:
+        if argv[1] == '-h':
+            print("""
 Welcome to the query program
 
 -h prints this message
@@ -151,14 +155,49 @@ Of course you can use these in tandem:
 will search for stb's that are stb1, with movie titles "the matrix"
 will order alphabetically by stb
 and will only display the stb and title columns
-              """)
-        exit(0)
+                  """)
+            exit(0)
 
-    for i in argv:
-        if i = argv[0]:
-            continue
+    select_list = []
+    order = ""
+    filter_list = []
 
-        if i
+    for i, v in enumerate(argv):
+        if v == "-s":
+            value = argv[i+1]
+            select_list = value.split(',')
+
+        elif v == "-o":
+            order = argv[i+1]
+
+        elif v == "-f":
+            value = argv[i+1]
+            outer_list = value.split(',')
+            for j in outer_list:
+                inner_list = j.split("=")
+                filter_list.append(inner_list)
+
+    query_list = []
+
+    # welp for now we get the whole db before filtering or anything
+    for i in os.listdir(filedir):
+        with open(filedir+i, 'r') as f:
+            query_list += f.readlines()
+
+    # print(order)
+    # print(select_list)
+    # print(filter_list)
+
+    if order:
+        query_list = orde(order, query_list)
+    if filter_list:
+        query_list = fil(filter_list, query_list)
+    if select_list:
+        query_list = sel(select_list, query_list)
+
+    # finally print our list we made
+    for i in query_list:
+        print(i, end="")
 
     return True
 

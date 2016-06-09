@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 import store as db
 import query as q
-from os import remove
+from os import remove, removedirs, makedirs, path
 
-file = "test1.dat"  # test db
+filedir = "testdb/"
 testfile = "infile.txt"  # test input file
 anothertestfile = "secondinfile.txt"  # second test input file
-db.file = file  # make sure we test on the test file, not the real db
+db.filedir = filedir
 
-# create an empty db file if it does not exist
-f = open(file, 'w')
-f.close()
+# create an empty db file directory
+if path.exists(filedir):
+    removedirs(filedir)
+makedirs(filedir)
 
 data = "STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME\nstb1|the matrix|warner bros|2014-04-01|4.00|1:30\nstb1|unbreakable|buena vista|2014-04-03|6.00|2:05\nstb2|the hobbit|warner bros|2014-04-02|8.00|2:45\nstb3|the matrix|warner bros|2014-04-02|4.00|1:05\n"
 moredata = "STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME\nstb3|the matrix|warner bros|2014-04-02|4.00|1:05\nstb3|new made up movie| buena vista|2014-04-03|6.00|2:05\n"
@@ -117,8 +118,8 @@ def test_order():
                    '1,matrix,warner bros,2014-04-01,4.00,1:30\n',
                    '3,matrix,warner bros,2014-04-02,4.00,1:05\n']
 
-    assert(q.ord('stb', orig_order) == new_order)
-    assert(q.ord('title', orig_order) == a_new_order)
+    assert(q.orde('stb', orig_order) == new_order)
+    assert(q.orde('title', orig_order) == a_new_order)
 
 def test_filter():
     no_filter = ['1,matrix,warner bros,2014-04-01,4.00,1:30\n',
@@ -157,7 +158,7 @@ def main():
 
     db.dropdb()  # clean up db one last time from last test
     print("All tests passed")  # This gives me a good feeling inside
-    remove(file)  # clean files from main directory
+    removedirs(filedir)  # clean files from main directory
     remove(testfile)  # clean files from main directory
     remove(anothertestfile)  # clean files from main directory
 
