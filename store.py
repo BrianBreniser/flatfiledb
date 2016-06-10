@@ -39,6 +39,7 @@ def _appenddb(text):
                 f.write(text)
         else:
             # Just write the data to the last file, still < 1mb
+            # bug warning: after 9 files (9mb total size) appending work improperly
             with open(filedir+list_of_files[-1], 'a') as f:
                 f.write(text)
 
@@ -65,7 +66,7 @@ def matchfound(stb, title, provider):
                 if i[0] == stb and i[1] == title and i[2] == provider:
                     return True  # this constitutes a match
         
-        return False  # no match found
+        return False
 
 def main():
     from sys import argv
@@ -86,8 +87,6 @@ if the file is not in the current directory please provide the full path
 in the even the file is not found, please check the spelling
 
 -d will destroy the database
-
--p will print the whole database, this is for debugging only, use ./query instead of the -p flag
               """)
         exit(0)
 

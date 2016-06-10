@@ -5,14 +5,15 @@ import os as os
 filedir = 'db/'
 
 def sel(sel_list, old_list):
-    """ Use orde before calling sel"""
+    """ In the main program, this must be called last"""
     if not isinstance(sel_list, list):
         return "select failed, first arg must be list"
     if not isinstance(old_list, list):
         return "select fail, second arg must be list"
 
-    new_list = []  # the new list with only the required options selected
+    new_list = []  # the new list with only the required rows selected
 
+    # build the new_list, only included sel_list columns
     for i in old_list:
         new_line = ""
         old_line = i.split(",")
@@ -46,7 +47,7 @@ def orde(ord_by, old_list):
         return "select fail, second arg must be list"
 
     new_list = []
-    lol = []  # list of lists
+    rowsAfterSplit = []
 
     k = 0
 
@@ -66,13 +67,16 @@ def orde(ord_by, old_list):
 
     for i in old_list:
         temp = i.split(",")
-        lol.append(temp)
+        rowsAfterSplit.append(temp)
 
-    # lol now contains a list of lists that can be ordered using sorted
-    lol = sorted(lol, key=lambda x: x[k])
+    # rowsAfterSplit now contains a list of lists that can be ordered using sorted
+    # This is the reason that currently I can only order by 1 item
+    # I planned on using a meta function to build the lambda function below
+    # That became too complicated, so I took the short cut that is there now
+    rowsAfterSplit = sorted(rowsAfterSplit, key=lambda x: x[k])
 
-    # create our new list
-    for i in lol:
+    # create our new list, ordered
+    for i in rowsAfterSplit:
         temp = ",".join(i)
         new_list.append(temp)
     
@@ -87,11 +91,14 @@ def fil(filter_list, old_list):
     if not isinstance(old_list, list):
         return "select fail, second arg must be list"
 
-    new_list = old_list[:]  # clones the list
+    # This is very inefficient, I didn't have time to work on performance
+    # this part of the algorithm got stuck in "it worked" phase, no
+    # optimization was done here
+    new_list = old_list[:]  # clone the list
 
     for i in filter_list:
         k = 0
-        # I reeealy wish Python had case statements
+        # I still really wish Python had case statements
         if i[0] == "stb":
             k = 0
         elif i[0] == "title":
@@ -105,11 +112,15 @@ def fil(filter_list, old_list):
         elif i[0] == "view_time":
             k = 5
 
+        # building our new list, including filter.
+        # this algorithm is very inefficient as it stands right now
+        # With my time crunch I could not optimize this, so it stayed in the
+        # "it worked" phase of development
         for j in old_list:
             li = j.split(",")
             if li[k] != i[1]:
                 try:
-                    new_list.remove(j)
+                    new_list.remove(j)  # This is inefficient, should build up not break down
                 except:
                     pass
 
@@ -117,9 +128,6 @@ def fil(filter_list, old_list):
 
 def main():
     from sys import argv
-
-    # print(len(argv))
-    # print(argv)
 
     if len(argv) > 1:
         if argv[1] == '-h':
@@ -162,6 +170,10 @@ and will only display the stb and title columns
     order = ""
     filter_list = []
 
+    # I could have used a built in library for this, but I required some
+    # specific syntax, and decided it was easier to just parse manually
+    # In theory I would have done more research and found a library that
+    # did exactly what I wanted. This works well for the time being though
     for i, v in enumerate(argv):
         if v == "-s":
             value = argv[i+1]
@@ -179,14 +191,13 @@ and will only display the stb and title columns
 
     query_list = []
 
-    # welp for now we get the whole db before filtering or anything
+    # this is also super inefficient right now, preferably I would go through
+    # the db and run the filter function, so that I don't have to pull the
+    # whole db into memory, which, part of the requirements state I need to
+    # be able to pull in partial data, so right now this doesn't comply
     for i in os.listdir(filedir):
         with open(filedir+i, 'r') as f:
             query_list += f.readlines()
-
-    # print(order)
-    # print(select_list)
-    # print(filter_list)
 
     if order:
         query_list = orde(order, query_list)
@@ -195,7 +206,7 @@ and will only display the stb and title columns
     if select_list:
         query_list = sel(select_list, query_list)
 
-    # finally print our list we made
+    # print our list we made
     for i in query_list:
         print(i, end="")
 
